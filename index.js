@@ -45,8 +45,20 @@ wss.on('connection', client => {
 
 				let game = games[gameCode];
 				let [_from, _to] = splitMessage(move); 
-				let [valid, won] = game.makeMove(client, _from, _to);
-				client.send(`move_valid_won${MSG_DELIM}${valid}${MSG_DELIM}${won}`);
+				let [valid, isFinished, checkMate] = game.makeMove(client, _from, _to);
+				if (isFinished && checkMate)
+				{
+					// this player won
+				}
+				else if (isFinished && (!checkMate))
+				{
+					// draw
+				}		
+						
+				if (valid) {
+					let opponent = client == game.player1 ? game.player2 : game.player1;
+					opponent.send(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
+				}
 			}
 		}
 	});

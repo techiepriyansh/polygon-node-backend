@@ -1,4 +1,7 @@
+const jsChessEngine = require('js-chess-engine');
+
 const assert = require('assert');
+
 const { Player } = require('./player.js')
 
 const WHITE = 0;
@@ -45,6 +48,7 @@ class Game
 	startGame()
 	{
 		assert.equal(this.status, GAME_READY);
+		this.chessGame = new jsChessEngine.Game();
 		this.status = WHITE_TO_MOVE;
 		this.playerToMove = this.white;
 	}
@@ -52,22 +56,28 @@ class Game
 	makeMove(player, _from, _to)
 	{
 		assert.equal(player, this.playerToMove);
-		// let valid = chessEngine.isValid(_from, _to);
-		let valid = true; 
-		if (!valid) return [false, false];
 
-		// let won = chessEngine.didWin(_from, _to);
-		let won = false;
-		if (won) {
-			this.status = GAME_OVER;
-			return [valid, won]
+		let valid = true;
+		try 
+		{
+			this.chessGame.move(_from, _to);
+		} catch (Error e) 
+		{
+			return [false, null, null];
 		}
 
-		let decider = this.status = WHITE;
+		let {isFinished, checkMate} = this.chessGame.board.configuration;
+		if (isFinished) 
+		{
+			this.status = GAME_OVER;
+			return [valid, isFinished, checkMate];
+		}
+
+		let decider = this.status == WHITE;
 		this.playerToMove = decider ? this.white : this.black; 
 		this.status = decider ? BLACK : WHITE;
 
-		return [valid, won];
+		return [valid, isFinished, checkMate];
 	}
 
 }
