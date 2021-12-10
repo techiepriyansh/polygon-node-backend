@@ -61,7 +61,7 @@ class Game
 		try 
 		{
 			this.chessGame.move(_from, _to);
-		} catch (Error e) 
+		} catch (e) 
 		{
 			return [false, null, null];
 		}

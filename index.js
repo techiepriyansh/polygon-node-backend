@@ -1,8 +1,16 @@
 const { WebSocketServer } = require('ws');
+import Chess from "./build.eth/contracts/Chess.json"
 require('dotenv').config()
-
+var Web3 = require('web3');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const mnemonic = process.env.MNEMONIC
+const clientURL = process.env.CLIENT_URL
+const contractAddress = process.env.CONTRACT_ADDRESS
+const walletAddress=process.env.WALLET_ADDRESS
 const assert = require('assert');
-
+const provider = new HDWalletProvider(mnemonic, clientURL);
+var web3 = new Web3(provider);
+var chessContract = new web3.eth.Contract(Chess.abi, contractAddress);
 const { Game }
 const { splitMessage, MSG_DELIM } = require('./utils.js');
 
@@ -48,7 +56,9 @@ wss.on('connection', client => {
 				let [valid, isFinished, checkMate] = game.makeMove(client, _from, _to);
 				if (isFinished && checkMate)
 				{
-					// this player won
+					
+					let winnerPubkey = game.playerToMove.pubkey // <- this player won
+					await chessContract.methods.declareWinner(gameCode,winnerPubkey,{from:walletAddress})
 				}
 				else if (isFinished && (!checkMate))
 				{
