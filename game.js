@@ -2,7 +2,7 @@ const jsChessEngine = require('js-chess-engine');
 
 const assert = require('assert');
 
-const { Player } = require('./player.js')
+const {Player} = require("./player")
 
 const WHITE = 0;
 const BLACK = 1;
@@ -22,6 +22,7 @@ class Game
 		this.player1 = new Player(hostSocket, hostPubkey);
 		this.code = gameCode;
 		this.status = PLAYER_ONE_CONNECTED;
+		console.log("Play 1 connected, status code ",this.status)
 	}
 
 	connectPlayer2(player2Socket, player2Pubkey)
@@ -29,6 +30,7 @@ class Game
 		assert.equal(this.status, PLAYER_ONE_CONNECTED);
 		this.player2 = new Player(player2Socket, player2Pubkey);
 		this.status = PLAYER_TWO_CONNECTED;
+		console.log("Player 2 is connected,status code ",this.status)
 	}
 
 	assignColors()
@@ -43,6 +45,7 @@ class Game
 		this.black = decider ? this.player2 : this.player1; 
 
 		this.status = GAME_READY;
+		console.log("Game ready, status code ",this.status)
 	}
 
 	startGame()
@@ -51,6 +54,7 @@ class Game
 		this.chessGame = new jsChessEngine.Game();
 		this.status = WHITE_TO_MOVE;
 		this.playerToMove = this.white;
+		console.log("White to move ",this.status)
 	}
 
 	makeMove(player, _from, _to)

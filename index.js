@@ -1,5 +1,5 @@
 const { WebSocketServer } = require('ws');
-import Chess from "./build.eth/contracts/Chess.json"
+const Chess = require("./build.eth/contracts/Chess.json")
 require('dotenv').config()
 var Web3 = require('web3');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
@@ -11,9 +11,8 @@ const assert = require('assert');
 const provider = new HDWalletProvider(mnemonic, clientURL);
 var web3 = new Web3(provider);
 var chessContract = new web3.eth.Contract(Chess.abi, contractAddress);
-const { Game }
 const { splitMessage, MSG_DELIM } = require('./utils.js');
-
+const {Game} =  require("./game")
 const wss = new WebSocketServer({ 
 	port: process.env.SOCKET_PORT, 
 });
@@ -45,6 +44,7 @@ wss.on('connection', client => {
 				game.player1.socket.send(`color${MSG_DELIM}${game.player1.color}`);
 				game.player2.socket.send(`color${MSG_DELIM}${game.player2.color}`);
 				game.startGame();
+				break;
 			}
 
 			case "move": {
@@ -58,7 +58,7 @@ wss.on('connection', client => {
 				{
 					
 					let winnerPubkey = game.playerToMove.pubkey // <- this player won
-					await chessContract.methods.declareWinner(gameCode,winnerPubkey,{from:walletAddress})
+					// (await chessContract.methods.declareWinner(gameCode,winnerPubkey,{from:walletAddress}))
 				}
 				else if (isFinished && (!checkMate))
 				{
@@ -69,6 +69,7 @@ wss.on('connection', client => {
 					let opponent = client == game.player1 ? game.player2 : game.player1;
 					opponent.send(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
 				}
+				break;
 			}
 		}
 	});

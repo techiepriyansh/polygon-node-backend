@@ -5,3 +5,4 @@ class Player {
 		this.socket = socket;
 	}
 }
+exports.Player = Player;
