@@ -79,7 +79,7 @@ class Game
 
 		let decider = this.status == WHITE;
 		this.playerToMove = decider ? this.white : this.black; 
-		this.status = decider ? BLACK : WHITE;
+		this.status = decider ? BLACK_TO_MOVE : WHITE_TO_MOVE;
 
 		return [valid, isFinished, checkMate];
 	}
