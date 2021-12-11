@@ -59,7 +59,7 @@ class Game
 
 	makeMove(player, _from, _to)
 	{
-		assert.equal(player, this.playerToMove);
+		// assert.equal(player, this.playerToMove.socket);
 
 		let valid = true;
 		try 
@@ -69,8 +69,8 @@ class Game
 		{
 			return [false, null, null];
 		}
-
-		let {isFinished, checkMate} = this.chessGame.board.configuration;
+		let json = this.chessGame.exportJson();
+		let {isFinished, checkMate} = json;
 		if (isFinished) 
 		{
 			this.status = GAME_OVER;

@@ -56,9 +56,10 @@ wss.on('connection', client => {
 				let [valid, isFinished, checkMate] = game.makeMove(client, _from, _to);
 				if (isFinished && checkMate)
 				{
-					
-					let winnerPubkey = game.playerToMove.pubkey // <- this player won
-					// (await chessContract.methods.declareWinner(gameCode,winnerPubkey,{from:walletAddress}))
+					var result;
+					let winnerPubkey = client == game.white.socket ? game.white.pubkey : game.black.pubkey; // <- this player won
+					(async () => {result = await chessContract.methods.declareWinner(parseInt(gameCode),winnerPubkey).send({from:walletAddress})})();
+					console.log(result)
 				}
 				else if (isFinished && (!checkMate))
 				{
@@ -66,8 +67,10 @@ wss.on('connection', client => {
 				}		
 						
 				if (valid) {
-					let opponent = client == game.player1 ? game.player2 : game.player1;
-					opponent.send(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
+					//let opponent = client == game.player1 ? game.player2 : game.player1;
+					console.log(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`)
+					game.player1.socket.send(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
+					game.player2.socket.send(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
 				}
 				break;
 			}
