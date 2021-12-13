@@ -68,16 +68,17 @@ wss.on("connection", (client) => {
         } else if (isFinished && !checkMate) {
           // draw
         }
-
+        
         if (valid) {
           let opponent = (client == game.player1.socket) ? game.player2.socket : game.player1.socket;
           console.log(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
           opponent.send(
             `opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
           );
+          let f = game.chessGame.exportFEN();
           wss.clients.forEach(function each(c) {
 						c.send(
-							`stream${MSG_DELIM}${gameCode}${MSG_DELIM}${currentFEN}`
+							`stream${MSG_DELIM}${gameCode}${MSG_DELIM}${f}`
 						);
 					});
         }
