@@ -35,7 +35,8 @@ wss.on("connection", (client) => {
 
       case "join_game": {
         let [pubkey, gameCode] = splitMessage(arg);
-        // assert.equal(games.hasOwnProperty(gameCode), true);
+        if (!games.hasOwnProperty(gameCode))
+          console.err(`The game with game code ${gameCode} does not exist`)
 
         let game = games[gameCode];
         game.connectPlayer2(client, pubkey);
@@ -57,25 +58,21 @@ wss.on("connection", (client) => {
 
         if (isFinished && checkMate) {
           var result;
-          let winnerPubkey =
-            client == game.white.socket ? game.white.pubkey : game.black.pubkey; // <- this player won
+          let winnerPubkey = game.playerToMove.pubkey;
+          console.log(`The winner is ${winnerPubkey}`);
           (async () => {
             result = await chessContract.methods
               .declareWinner(parseInt(gameCode), winnerPubkey)
               .send({ from: walletAddress });
           })();
-          console.log(result);
         } else if (isFinished && !checkMate) {
           // draw
         }
 
         if (valid) {
-          //let opponent = client == game.player1 ? game.player2 : game.player1;
+          let opponent = (client == game.player1.socket) ? game.player2.socket : game.player1.socket;
           console.log(`opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`);
-          game.player1.socket.send(
-            `opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
-          );
-          game.player2.socket.send(
+          opponent.send(
             `opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
           );
           wss.clients.forEach(function each(c) {
