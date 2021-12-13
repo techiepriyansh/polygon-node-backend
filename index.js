@@ -76,11 +76,10 @@ wss.on("connection", (client) => {
             `opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
           );
           wss.clients.forEach(function each(c) {
-              c.send(
-                `stream${MSG_DELIM}${gameCode}${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
-              );
-            
-          });
+						c.send(
+							`stream${MSG_DELIM}${gameCode}${MSG_DELIM}${currentFEN}`
+						);
+					});
         }
         break;
       }
