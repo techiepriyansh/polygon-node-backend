@@ -87,7 +87,7 @@ wss.on("connection", (client) => {
       case "get_game": {
         let game = games[arg];
         let currentFEN = game.chessGame.exportFEN();
-        client.send(`init_game${MSG_DELIM}${arg}${MSG_DELIM}${currentFEN}`);
+        client.send(`init_game${MSG_DELIM}${arg}${MSG_DELIM}${currentFEN}${MSG_DELIM}${game.white.pubkey}${MSG_DELIM}${game.black.pubkey}`);
         break;
       }
     }
