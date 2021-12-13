@@ -22,20 +22,23 @@ class Game
 		this.player1 = new Player(hostSocket, hostPubkey);
 		this.code = gameCode;
 		this.status = PLAYER_ONE_CONNECTED;
-		console.log("Play 1 connected, status code ",this.status)
+		console.log("Player 1 connected, status code ", this.status)
 	}
 
 	connectPlayer2(player2Socket, player2Pubkey)
 	{
-		assert.equal(this.status, PLAYER_ONE_CONNECTED);
+		if (this.status != PLAYER_ONE_CONNECTED)
+			console.err("Player 1 not connected yet!");
+
 		this.player2 = new Player(player2Socket, player2Pubkey);
 		this.status = PLAYER_TWO_CONNECTED;
-		console.log("Player 2 is connected,status code ",this.status)
+		console.log("Player 2 is connected, status code ", this.status)
 	}
 
 	assignColors()
 	{
-		assert.equal(this.status, PLAYER_TWO_CONNECTED);
+		if (this.status != PLAYER_TWO_CONNECTED)
+			console.err("Player two not connected yet!");
 
 		let decider = Math.random() > 0.5;
 		this.player1.color = decider ? WHITE : BLACK;
@@ -45,21 +48,24 @@ class Game
 		this.black = decider ? this.player2 : this.player1; 
 
 		this.status = GAME_READY;
-		console.log("Game ready, status code ",this.status)
+		console.log("Game ready, status code ", this.status)
 	}
 
 	startGame()
 	{
-		assert.equal(this.status, GAME_READY);
+		if (this.status != GAME_READY)
+			console.err("Game not ready yet!")
+
 		this.chessGame = new jsChessEngine.Game();
 		this.status = WHITE_TO_MOVE;
 		this.playerToMove = this.white;
-		console.log("White to move ",this.status)
+		console.log("Game started, white to move");
 	}
 
-	makeMove(player, _from, _to)
+	makeMove(playerSocket, _from, _to)
 	{
-		// assert.equal(player, this.playerToMove.socket);
+		if (playerSocket != this.playerToMove.socket) 
+			console.err("Not this player's move");
 
 		let valid = true;
 		try 
@@ -69,6 +75,7 @@ class Game
 		{
 			return [false, null, null];
 		}
+
 		let json = this.chessGame.exportJson();
 		let {isFinished, checkMate} = json;
 		if (isFinished) 
@@ -77,8 +84,8 @@ class Game
 			return [valid, isFinished, checkMate];
 		}
 
-		let decider = this.status == WHITE;
-		this.playerToMove = decider ? this.white : this.black; 
+		let decider = this.status == WHITE_TO_MOVE;
+		this.playerToMove = decider ? this.black : this.white; 
 		this.status = decider ? BLACK_TO_MOVE : WHITE_TO_MOVE;
 
 		return [valid, isFinished, checkMate];
