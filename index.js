@@ -35,7 +35,7 @@ wss.on("connection", (client) => {
 
       case "join_game": {
         let [pubkey, gameCode] = splitMessage(arg);
-        assert.equal(games.hasOwnProperty(gameCode), true);
+        // assert.equal(games.hasOwnProperty(gameCode), true);
 
         let game = games[gameCode];
         game.connectPlayer2(client, pubkey);
@@ -78,12 +78,11 @@ wss.on("connection", (client) => {
           game.player2.socket.send(
             `opponent_move${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
           );
-          wss.clients.forEach(function each(client) {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-              client.send(
+          wss.clients.forEach(function each(c) {
+              c.send(
                 `stream${MSG_DELIM}${gameCode}${MSG_DELIM}${_from}${MSG_DELIM}${_to}`
               );
-            }
+            
           });
         }
         break;
